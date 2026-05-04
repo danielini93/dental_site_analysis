@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dental Office Site Selection — Market Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface2: #21262d;
+  --border: #30363d;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --green: #3fb950;
+  --blue: #58a6ff;
+  --purple: #bc8cff;
+  --amber: #e3b341;
+  --red: #f85149;
+  --green-dim: rgba(63,185,80,0.12);
+  --blue-dim: rgba(88,166,255,0.12);
+  --purple-dim: rgba(188,140,255,0.12);
+  --amber-dim: rgba(227,179,65,0.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;font-size:14px;line-height:1.5;min-height:100vh}
+
+/* ── HEADER ─────────────────────────────── */
+header{position:sticky;top:0;z-index:200;background:var(--surface);border-bottom:1px solid var(--border);padding:14px 28px}
+.hdr{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.hdr-brand{display:flex;align-items:center;gap:12px}
+.hdr-icon{width:38px;height:38px;border-radius:9px;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+.hdr-title{font-size:16px;font-weight:700}
+.hdr-sub{font-size:11px;color:var(--muted)}
+.hdr-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.4px;text-transform:uppercase}
+.badge-green{background:var(--green-dim);color:var(--green);border:1px solid rgba(63,185,80,.25)}
+.badge-blue{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(88,166,255,.25)}
+.hdr-date{font-size:12px;color:var(--muted)}
+
+/* ── PAGE ────────────────────────────────── */
+.page{max-width:1400px;margin:0 auto;padding:28px 28px 56px}
+
+/* ── SECTIONS ────────────────────────────── */
+.sec{margin-bottom:36px}
+.sec-hdr{display:flex;align-items:baseline;gap:10px;margin-bottom:14px}
+.sec-title{font-size:15px;font-weight:600}
+.sec-sub{font-size:12px;color:var(--muted)}
+
+/* ── GRID ────────────────────────────────── */
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g32{display:grid;grid-template-columns:3fr 2fr;gap:14px}
+
+/* ── CARD ────────────────────────────────── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px}
+.card-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:14px}
+
+/* ── KPI TILES ───────────────────────────── */
+.kpi{padding:18px 20px}
+.kpi-val{font-size:28px;font-weight:700;line-height:1.1;margin-bottom:3px}
+.kpi-lbl{font-size:12px;color:var(--muted)}
+.kpi-foot{font-size:11px;color:var(--muted);margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.kpi.green{border-top:3px solid var(--green)}.kpi.green .kpi-val{color:var(--green)}
+.kpi.blue{border-top:3px solid var(--blue)}.kpi.blue .kpi-val{color:var(--blue)}
+.kpi.purple{border-top:3px solid var(--purple)}.kpi.purple .kpi-val{color:var(--purple)}
+.kpi.amber{border-top:3px solid var(--amber)}.kpi.amber .kpi-val{color:var(--amber)}
+
+/* ── LEGEND ──────────────────────────────── */
+.legend{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:14px}
+.leg-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* ── CHART WRAPPER ───────────────────────── */
+.ch{position:relative}
+
+/* ── COMPARISON TABLE ────────────────────── */
+.ctbl{width:100%;border-collapse:collapse}
+.ctbl th{padding:8px 10px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
+.ctbl td{padding:9px 10px;font-size:12px;border-bottom:1px solid var(--surface2);vertical-align:middle}
+.ctbl tr:last-child td{border-bottom:none}
+.ctbl .metric{color:var(--muted)}
+.vg{color:var(--green);font-weight:600}
+.vb{color:var(--blue);font-weight:600}
+.vp{color:var(--purple);font-weight:600}
+.va{color:var(--amber);font-weight:600}
+
+/* ── SALARY TABLE ────────────────────────── */
+.stbl{width:100%;border-collapse:collapse}
+.stbl th{background:var(--surface2);padding:9px 14px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
+.stbl td{padding:11px 14px;font-size:13px;border-bottom:1px solid var(--surface2)}
+.stbl tr:last-child td{border-bottom:none}
+.stbl .role{font-weight:600}
+.stbl .median{font-weight:700;color:var(--blue)}
+.stbl .note{font-size:11px;color:var(--muted);font-style:italic}
+
+/* ── DATA TABLE ──────────────────────────── */
+.dtbl-wrap{overflow-x:auto;border-radius:8px}
+.dtbl{width:100%;border-collapse:collapse;font-size:12px}
+.dtbl thead th{background:var(--surface2);padding:9px 12px;text-align:left;font-weight:600;color:var(--muted);white-space:nowrap;cursor:pointer;user-select:none;border-bottom:1px solid var(--border)}
+.dtbl thead th:hover{color:var(--text)}
+.dtbl thead th.sorted{color:var(--blue)}
+.dtbl tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+.dtbl tbody tr:hover{background:var(--surface2)}
+.dtbl tbody td{padding:8px 12px;white-space:nowrap}
+.dtbl tr.rg{background:rgba(63,185,80,.05)}
+.dtbl tr.rb{background:rgba(88,166,255,.05)}
+.dtbl tr.rp{background:rgba(188,140,255,.05)}
+.dtbl tr.ra{background:rgba(227,179,65,.05)}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.pill.pg{background:var(--green-dim);color:var(--green)}
+.pill.pb{background:var(--blue-dim);color:var(--blue)}
+.pill.pp{background:var(--purple-dim);color:var(--purple)}
+.pill.pa{background:var(--amber-dim);color:var(--amber)}
+
+/* ── SCORE BAR ───────────────────────────── */
+.sb-wrap{display:flex;align-items:center;gap:8px}
+.sb-bg{width:70px;height:5px;background:var(--surface2);border-radius:3px;flex-shrink:0}
+.sb-fill{height:100%;border-radius:3px}
+
+/* ── SEARCH ──────────────────────────────── */
+.search-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.search-inp{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 13px;color:var(--text);font-size:13px;font-family:inherit;width:240px;outline:none}
+.search-inp:focus{border-color:var(--blue)}
+.search-inp::placeholder{color:var(--muted)}
+.row-count{font-size:12px;color:var(--muted)}
+
+/* ── DIVIDER ─────────────────────────────── */
+.div{height:1px;background:var(--border);margin:32px 0}
+
+/* ── FOOTER ──────────────────────────────── */
+footer{border-top:1px solid var(--border);padding:18px 28px;text-align:center;color:var(--muted);font-size:11px}
+
+/* ── SCROLLBAR ───────────────────────────── */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--surface)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--muted)}
+
+/* ── RESPONSIVE ──────────────────────────── */
+@media(max-width:1100px){.g4{grid-template-columns:1fr 1fr}.g32{grid-template-columns:1fr}}
+@media(max-width:720px){.g4,.g2,.g32{grid-template-columns:1fr}.page{padding:16px 14px 40px}.kpi-val{font-size:22px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr">
+    <div class="hdr-brand">
+      <div class="hdr-icon">🦷</div>
+      <div>
+        <div class="hdr-title">Dental Office Site Selection</div>
+        <div class="hdr-sub">Market Intelligence Dashboard — New Jersey Regional Analysis</div>
+      </div>
+    </div>
+    <div class="hdr-right">
+      <span class="badge badge-green">20 Markets Analyzed</span>
+      <span class="badge badge-blue">4 Shortlisted</span>
+      <span class="hdr-date">April 2026</span>
+    </div>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- KPIs -->
+  <div class="sec">
+    <div class="g4">
+      <div class="card kpi green">
+        <div class="card-title">Top Recommendation</div>
+        <div class="kpi-val" style="font-size:22px">West Orange</div>
+        <div class="kpi-lbl">Essex County · ZIP 07028</div>
+        <div class="kpi-foot">Opp. Score 61.9 · 5,776 people/dentist · $101K income</div>
+      </div>
+      <div class="card kpi blue">
+        <div class="card-title">#2 Recommendation</div>
+        <div class="kpi-val" style="font-size:22px">Hoboken</div>
+        <div class="kpi-lbl">Hudson County · ZIP 07030</div>
+        <div class="kpi-foot">Opp. Score 56.2 · $117K income · Implant/ortho gap</div>
+      </div>
+      <div class="card kpi purple">
+        <div class="card-title">Lowest 3-Year Cost</div>
+        <div class="kpi-val">$540K</div>
+        <div class="kpi-lbl">Linden — Year 3 Total</div>
+        <div class="kpi-foot">Year 1: $434K · Year 2: $487K</div>
+      </div>
+      <div class="card kpi amber">
+        <div class="card-title">Markets Analyzed</div>
+        <div class="kpi-val">20</div>
+        <div class="kpi-lbl">NJ Cities · 4 Counties</div>
+        <div class="kpi-foot">Union · Hudson · Essex · Bergen</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bubble Chart -->
+  <div class="sec">
+    <div class="sec-hdr">
+      <div class="sec-title">Market Opportunity Map</div>
+      <div class="sec-sub">Income vs. Competitive Openness · Bubble size = Population</div>
+    </div>
+    <div class="card">
+      <div class="legend">
+        <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div>West Orange (#1)</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--blue)"></div>Hoboken (#2)</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--purple)"></div>Rahway</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--amber)"></div>Linden</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#4b5563"></div>Other Markets</div>
+      </div>
+      <div class="ch" style="height:400px"><canvas id="bubbleChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Competitive Landscape -->
+  <div class="sec">
+    <div class="sec-hdr">
+      <div class="sec-title">Competitive Landscape</div>
+      <div class="sec-sub">All 20 markets benchmarked</div>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div class="card-title">People Per General Dentist <span style="font-weight:400">(higher = more underserved)</span></div>
+        <div class="ch" style="height:430px"><canvas id="ppdChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Market Saturation Score <span style="font-weight:400">(lower = less competition)</span></div>
+        <div class="ch" style="height:430px"><canvas id="satChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top 4 Analysis -->
+  <div class="sec">
+    <div class="sec-hdr">
+      <div class="sec-title">Top 4 City Deep-Dive</div>
+      <div class="sec-sub">Normalized scores across 5 opportunity dimensions</div>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div class="card-title">Multi-Dimension Comparison</div>
+        <div class="ch" style="height:380px"><canvas id="radarChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Head-to-Head Metrics</div>
+        <div style="overflow-x:auto">
+          <table class="ctbl">
+            <thead>
+              <tr>
+                <th>Metric</th>
+                <th style="color:var(--green)">West Orange</th>
+                <th style="color:var(--blue)">Hoboken</th>
+                <th style="color:var(--purple)">Rahway</th>
+                <th style="color:var(--amber)">Linden</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="metric">Population</td><td class="vg">46,207</td><td class="vb">54,660</td><td class="vp">29,043</td><td class="va">42,876</td></tr>
+              <tr><td class="metric">Median Income</td><td class="vg">$101,058</td><td class="vb">$117,795</td><td class="vp">$62,266</td><td class="va">$53,837</td></tr>
+              <tr><td class="metric">Insurance Rate</td><td class="vg">94.3%</td><td class="vb">93.4%</td><td class="vp">91.9%</td><td class="va">89.9%</td></tr>
+              <tr><td class="metric">College Educated</td><td class="vg">55.3%</td><td class="vb">65.7%</td><td class="vp">29.2%</td><td class="va">20.2%</td></tr>
+              <tr><td class="metric">People / Dentist</td><td class="vg">5,776</td><td class="vb">3,904</td><td class="vp">7,261</td><td class="va">6,125</td></tr>
+              <tr><td class="metric">Saturation Score</td><td class="vg">42.2</td><td class="vb">52.1</td><td class="vp">25.8</td><td class="va">31.5</td></tr>
+              <tr><td class="metric">Total Practices</td><td class="vg">13</td><td class="vb">19</td><td class="vp">5</td><td class="va">9</td></tr>
+              <tr><td class="metric">Avg Google Rating</td><td class="vg">4.8 ★</td><td class="vb">4.5 ★</td><td class="vp">4.8 ★</td><td class="va">4.6 ★</td></tr>
+              <tr><td class="metric">Year 1 Budget</td><td class="vg">$541K</td><td class="vb">$627K</td><td class="vp">$479K</td><td class="va">$434K</td></tr>
+              <tr><td class="metric">Year 3 Budget</td><td class="vg">$647K</td><td class="vb">$736K</td><td class="vp">$583K</td><td class="va">$540K</td></tr>
+              <tr><td class="metric">Service Gap</td><td class="vg">Cosmetic/implants</td><td class="vb">Implants/ortho</td><td class="vp">All specialty</td><td class="va">Basic cosmetic</td></tr>
+              <tr><td class="metric">Opportunity Score</td><td class="vg">61.9 / 100</td><td class="vb">56.2 / 100</td><td class="vp">55.3 / 100</td><td class="va">43.7 / 100</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cost Projections -->
+  <div class="sec">
+    <div class="sec-hdr">
+      <div class="sec-title">3-Year Cost Projections</div>
+      <div class="sec-sub">Salaries benchmarked to NJ BLS / Salary.com 2025 · figures in $K</div>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div class="card-title">Total Annual Operating Cost — 3-Year Trajectory</div>
+        <div class="ch" style="height:310px"><canvas id="costLineChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Year 1 Cost Breakdown by Category</div>
+        <div class="ch" style="height:310px"><canvas id="costStackChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Salary Benchmarks -->
+  <div class="sec">
+    <div class="sec-hdr">
+      <div class="sec-title">NJ Salary Benchmarks vs. Budgeted Salaries</div>
+      <div class="sec-sub">Source: BLS 2025, Salary.com, ZipRecruiter NJ · Year 1 figures · Dentist = owner draw</div>
+    </div>
+    <div class="card">
+      <div style="overflow-x:auto">
+        <table class="stbl">
+          <thead>
+            <tr>
+              <th>Role</th>
+              <th>NJ Market Low</th>
+              <th>NJ Median</th>
+              <th>NJ Market High</th>
+              <th style="color:var(--green)">West Orange Y1</th>
+              <th style="color:var(--blue)">Hoboken Y1</th>
+              <th style="color:var(--purple)">Rahway Y1</th>
+              <th style="color:var(--amber)">Linden Y1</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="role">General Dentist <span class="note">(startup draw)</span></td>
+              <td>$196,229</td><td class="median">$213,338</td><td>$293,810</td>
+              <td style="color:var(--green);font-weight:600">$100,000</td>
+              <td style="color:var(--blue);font-weight:600">$110,000</td>
+              <td style="color:var(--purple);font-weight:600">$92,000</td>
+              <td style="color:var(--amber);font-weight:600">$90,000</td>
+            </tr>
+            <tr>
+              <td class="role">Dental Hygienist</td>
+              <td>$82,208</td><td class="median">$89,303</td><td>$98,490</td>
+              <td style="color:var(--green);font-weight:600">$86,000</td>
+              <td style="color:var(--blue);font-weight:600">$92,000</td>
+              <td style="color:var(--purple);font-weight:600">$80,000</td>
+              <td style="color:var(--amber);font-weight:600">$78,000</td>
+            </tr>
+            <tr>
+              <td class="role">Dental Assistant</td>
+              <td>$38,000</td><td class="median">$45,266</td><td>$52,000</td>
+              <td style="color:var(--green);font-weight:600">$48,000</td>
+              <td style="color:var(--blue);font-weight:600">$52,000</td>
+              <td style="color:var(--purple);font-weight:600">$45,000</td>
+              <td style="color:var(--amber);font-weight:600">$44,000</td>
+            </tr>
+            <tr>
+              <td class="role">Office Manager / Front Desk</td>
+              <td>$55,261</td><td class="median">$63,000</td><td>$87,349</td>
+              <td style="color:var(--green);font-weight:600">$63,000</td>
+              <td style="color:var(--blue);font-weight:600">$68,000</td>
+              <td style="color:var(--purple);font-weight:600">$57,000</td>
+              <td style="color:var(--amber);font-weight:600">$56,000</td>
+            </tr>
+            <tr style="background:var(--surface2)">
+              <td colspan="8" class="note" style="padding:10px 14px">
+                ★ Dentist Y1 represents reduced startup owner draw. Market rate is approached by Year 3: West Orange $220K · Hoboken $235K · Rahway $205K · Linden $200K
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- City Explorer -->
+  <div class="sec">
+    <div class="sec-hdr">
+      <div class="sec-title">City Demographics Explorer</div>
+      <div class="sec-sub">All 20 markets · Click any column header to sort</div>
+    </div>
+    <div class="card">
+      <div class="search-row">
+        <input class="search-inp" id="srch" placeholder="Search city or county…" oninput="filterTbl()">
+        <span class="row-count" id="rowCnt">20 cities</span>
+      </div>
+      <div class="dtbl-wrap">
+        <table class="dtbl" id="dtbl">
+          <thead>
+            <tr>
+              <th onclick="sortTbl(0)">City</th>
+              <th onclick="sortTbl(1)">County</th>
+              <th onclick="sortTbl(2)">Population</th>
+              <th onclick="sortTbl(3)">Median Income</th>
+              <th onclick="sortTbl(4)">Ins. Rate</th>
+              <th onclick="sortTbl(5)">College Ed.</th>
+              <th onclick="sortTbl(6)">Practices</th>
+              <th onclick="sortTbl(7)">People/Dentist</th>
+              <th onclick="sortTbl(8)">Sat. Score</th>
+              <th onclick="sortTbl(9)">Avg Rating</th>
+              <th onclick="sortTbl(10)">Opp. Score</th>
+            </tr>
+          </thead>
+          <tbody id="dtbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Dental Office Site Selection · NJ Regional Analysis · April 2026 &nbsp;|&nbsp;
+  Data: NJ municipal demographics · BLS 2025 · Salary.com · CommercialCafe · Google Reviews
+</footer>
+
+<script>
+// ─── DATA ────────────────────────────────────────────────────
+const C = {
+  green:'#3fb950', blue:'#58a6ff', purple:'#bc8cff', amber:'#e3b341', gray:'#4b5563',
+  gd:'rgba(63,185,80,.18)', bd:'rgba(88,166,255,.18)', pd:'rgba(188,140,255,.18)',
+  ad:'rgba(227,179,65,.18)', grd:'rgba(75,85,99,.18)',
+  grid:'rgba(48,54,61,.9)', muted:'#8b949e', text:'#e6edf3'
+};
+
+const TOP4 = ['West Orange','Hoboken','Rahway','Linden'];
+
+const cities = [
+  {city:'Westfield',       zip:'07090',county:'Union',  pop:29823, income:149624,ins:95.6,edu:69.9,practices:10,genD:10,rating:4.9,reviews:2811, ppd:2982, sat:50.3,score:67.8},
+  {city:'Hoboken',         zip:'07030',county:'Hudson', pop:54660, income:117795,ins:93.4,edu:65.7,practices:19,genD:14,rating:4.5,reviews:7631, ppd:3904, sat:52.1,score:56.2},
+  {city:'Paramus',         zip:'07652',county:'Bergen', pop:26559, income:102315,ins:95.7,edu:56.3,practices:14,genD:8, rating:4.9,reviews:3824, ppd:3320, sat:79.1,score:47.3},
+  {city:'West Orange',     zip:'07028',county:'Essex',  pop:46207, income:101058,ins:94.3,edu:55.3,practices:13,genD:8, rating:4.8,reviews:3590, ppd:5776, sat:42.2,score:61.9},
+  {city:'Fort Lee',        zip:'07024',county:'Bergen', pop:37369, income:92241, ins:94.9,edu:59.7,practices:16,genD:10,rating:4.8,reviews:680,  ppd:3737, sat:64.2,score:48.6},
+  {city:'Englewood',       zip:'07631',county:'Bergen', pop:27990, income:78065, ins:93.4,edu:48.6,practices:19,genD:12,rating:4.8,reviews:4217, ppd:2333, sat:101.8,score:25.8},
+  {city:'Elmwood Park',    zip:'07407',county:'Bergen', pop:20161, income:71784, ins:92.4,edu:32.6,practices:9, genD:8, rating:4.8,reviews:1927, ppd:2520, sat:67.0,score:33.5},
+  {city:'Bloomfield',      zip:'07003',county:'Essex',  pop:48401, income:70935, ins:92.5,edu:40.5,practices:13,genD:10,rating:4.8,reviews:3579, ppd:4840, sat:40.3,score:48.0},
+  {city:'Jersey City 7302',zip:'07302',county:'Hudson', pop:265549,income:68698, ins:91.4,edu:38.9,practices:16,genD:10,rating:4.8,reviews:7165, ppd:26555,sat:9.0, score:68.3},
+  {city:'Roselle Park',    zip:'07204',county:'Union',  pop:21698, income:66719, ins:92.1,edu:30.9,practices:5, genD:5, rating:4.7,reviews:1702, ppd:4340, sat:34.6,score:46.5},
+  {city:'Hackensack',      zip:'07601',county:'Bergen', pop:44033, income:65833, ins:92.6,edu:43.1,practices:13,genD:10,rating:4.8,reviews:7067, ppd:4403, sat:44.3,score:44.5},
+  {city:'Rahway',          zip:'07065',county:'Union',  pop:29043, income:62266, ins:91.9,edu:29.2,practices:5, genD:4, rating:4.8,reviews:681,  ppd:7261, sat:25.8,score:55.3},
+  {city:'Jersey City 7306',zip:'07306',county:'Hudson', pop:73457, income:57355, ins:88.9,edu:26.3,practices:12,genD:9, rating:4.6,reviews:4349, ppd:8162, sat:24.5,score:49.9},
+  {city:'Linden',          zip:'07036',county:'Union',  pop:42876, income:53837, ins:89.9,edu:20.2,practices:9, genD:7, rating:4.6,reviews:3065, ppd:6125, sat:31.5,score:43.7},
+  {city:'Union City',      zip:'07087',county:'Hudson', pop:69330, income:51695, ins:88.6,edu:25.9,practices:22,genD:18,rating:4.4,reviews:4384, ppd:3852, sat:47.6,score:29.1},
+  {city:'West New York',   zip:'07093',county:'Hudson', pop:52569, income:48615, ins:87.5,edu:25.5,practices:14,genD:12,rating:4.6,reviews:5968, ppd:4381, sat:39.9,score:29.7},
+  {city:'Elizabeth',       zip:'07201',county:'Union',  pop:129992,income:48509, ins:87.4,edu:18.0,practices:10,genD:9, rating:4.6,reviews:9936, ppd:14444,sat:11.5,score:53.1},
+  {city:'Irvington',       zip:'07111',county:'Essex',  pop:54695, income:42524, ins:91.1,edu:13.4,practices:7, genD:6, rating:4.24,reviews:1162, ppd:9116, sat:19.2,score:55.2},
+  {city:'Newark',          zip:'07102',county:'Essex',  pop:282090,income:37642, ins:86.9,edu:18.1,practices:14,genD:13,rating:3.9, reviews:13164,ppd:21699,sat:7.4, score:50.4},
+  {city:'East Orange',     zip:'07017',county:'Essex',  pop:67681, income:36199, ins:88.4,edu:14.6,practices:7, genD:7, rating:4.43,reviews:3395, ppd:9669, sat:15.5,score:50.0},
+];
+
+const costs = {
+  'Linden':      {rent:[96,96,96],   dentist:[90,158,200], hyg:[78,78,82], asst:[44,44,46], mgr:[56,56,59], eqp:[40,25,25], ins:[30,30,32], tot:[434,487,540]},
+  'Rahway':      {rent:[120,120,120],dentist:[92,163,205], hyg:[80,80,84], asst:[45,45,47], mgr:[57,57,60], eqp:[50,30,30], ins:[35,35,37], tot:[479,530,583]},
+  'West Orange': {rent:[144,144,144],dentist:[100,175,220],hyg:[86,86,90], asst:[48,48,50], mgr:[63,63,66], eqp:[60,35,35], ins:[40,40,42], tot:[541,591,647]},
+  'Hoboken':     {rent:[192,192,192],dentist:[110,190,235],hyg:[92,92,96], asst:[52,52,54], mgr:[68,68,71], eqp:[65,38,38], ins:[48,48,50], tot:[627,680,736]},
+};
+
+const clr  = n => n==='West Orange'?C.green:n==='Hoboken'?C.blue:n==='Rahway'?C.purple:n==='Linden'?C.amber:C.gray;
+const clrd = n => n==='West Orange'?C.gd:n==='Hoboken'?C.bd:n==='Rahway'?C.pd:n==='Linden'?C.ad:C.grd;
+
+// ─── CHART DEFAULTS ──────────────────────────────────────────
+Chart.defaults.color = C.muted;
+Chart.defaults.font.family = "'Inter',system-ui,sans-serif";
+Chart.defaults.font.size = 12;
+
+// ─── 1. BUBBLE CHART ─────────────────────────────────────────
+(()=>{
+  const toR = p => Math.max(6, Math.sqrt(p/282090)*40);
+  const top4 = cities.filter(c=>TOP4.includes(c.city));
+  const rest  = cities.filter(c=>!TOP4.includes(c.city));
+  new Chart(document.getElementById('bubbleChart'),{
+    type:'bubble',
+    data:{datasets:[
+      ...top4.map(c=>({
+        label:c.city,
+        data:[{x:c.income,y:+(110-c.sat).toFixed(1),r:toR(c.pop),pop:c.pop,sat:c.sat}],
+        backgroundColor:clrd(c.city), borderColor:clr(c.city), borderWidth:2
+      })),
+      {label:'Other Markets',
+       data:rest.map(c=>({x:c.income,y:+(110-c.sat).toFixed(1),r:toR(c.pop),pop:c.pop,label:c.city,sat:c.sat})),
+       backgroundColor:C.grd, borderColor:C.gray, borderWidth:1}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},
+        tooltip:{callbacks:{label:ctx=>{
+          const d=ctx.raw;
+          return[` ${d.label||ctx.dataset.label}`,` Income: $${d.x.toLocaleString()}`,` Openness: ${d.y}`,` Pop: ${(d.pop||0).toLocaleString()}`];
+        }}}},
+      scales:{
+        x:{title:{display:true,text:'Median Household Income ($)',color:C.muted},grid:{color:C.grid},ticks:{callback:v=>'$'+(v/1000).toFixed(0)+'K'}},
+        y:{title:{display:true,text:'Competitive Openness ↑ (100 = no competition)',color:C.muted},grid:{color:C.grid},min:0,max:112}
+      }
+    }
+  });
+})();
+
+// ─── 2. PPD CHART ────────────────────────────────────────────
+(()=>{
+  const s=[...cities].sort((a,b)=>b.ppd-a.ppd);
+  new Chart(document.getElementById('ppdChart'),{
+    type:'bar',
+    data:{
+      labels:s.map(c=>c.city),
+      datasets:[{data:s.map(c=>Math.min(c.ppd,15000)),
+        backgroundColor:s.map(c=>clrd(c.city)),borderColor:s.map(c=>clr(c.city)),borderWidth:1.5,borderRadius:3}]
+    },
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${s[ctx.dataIndex].ppd.toLocaleString()} people/dentist`}}},
+      scales:{x:{grid:{color:C.grid},ticks:{callback:v=>v.toLocaleString()}},y:{grid:{color:'transparent'},ticks:{font:{size:11}}}}
+    }
+  });
+})();
+
+// ─── 3. SATURATION CHART ─────────────────────────────────────
+(()=>{
+  const s=[...cities].sort((a,b)=>a.sat-b.sat);
+  new Chart(document.getElementById('satChart'),{
+    type:'bar',
+    data:{
+      labels:s.map(c=>c.city),
+      datasets:[{data:s.map(c=>c.sat),
+        backgroundColor:s.map(c=>clrd(c.city)),borderColor:s.map(c=>clr(c.city)),borderWidth:1.5,borderRadius:3}]
+    },
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` Saturation: ${ctx.raw}`}}},
+      scales:{x:{grid:{color:C.grid}},y:{grid:{color:'transparent'},ticks:{font:{size:11}}}}
+    }
+  });
+})();
+
+// ─── 4. RADAR CHART ──────────────────────────────────────────
+(()=>{
+  const radar={
+    'West Orange':[57.2, 84.1, 44.9, 78.4, 52.3, 61.9],
+    'Hoboken':    [71.9, 73.9, 20.5, 65.4, 69.2, 56.2],
+    'Rahway':     [23.0, 56.8, 64.3, 100,  17.8, 55.3],
+    'Linden':     [15.5, 34.1, 49.5, 92.5, 45.6, 43.7],
+  };
+  new Chart(document.getElementById('radarChart'),{
+    type:'radar',
+    data:{
+      labels:['Income Score','Insurance Rate','Underserved (PPD)','Low Competition','Population','Opp. Score'],
+      datasets:TOP4.map(n=>({label:n,data:radar[n],backgroundColor:clrd(n),borderColor:clr(n),borderWidth:2,pointBackgroundColor:clr(n),pointRadius:4}))
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyle:'circle',padding:14,font:{size:11}}}},
+      scales:{r:{min:0,max:100,grid:{color:C.grid},angleLines:{color:C.grid},ticks:{display:false},pointLabels:{color:C.muted,font:{size:11}}}}
+    }
+  });
+})();
+
+// ─── 5. COST LINE ─────────────────────────────────────────────
+(()=>{
+  new Chart(document.getElementById('costLineChart'),{
+    type:'line',
+    data:{
+      labels:['Year 1','Year 2','Year 3'],
+      datasets:TOP4.map(n=>({
+        label:n, data:costs[n].tot, borderColor:clr(n), backgroundColor:clrd(n),
+        borderWidth:2.5, pointRadius:5, pointBackgroundColor:clr(n), tension:.3, fill:false
+      }))
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyle:'circle',padding:14}},
+        tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: $${ctx.raw}K`}}},
+      scales:{
+        x:{grid:{color:C.grid}},
+        y:{grid:{color:C.grid},min:380,ticks:{callback:v=>'$'+v+'K'}}
+      }
+    }
+  });
+})();
+
+// ─── 6. COST STACKED BAR ─────────────────────────────────────
+(()=>{
+  const cats=[
+    {key:'rent',    label:'Rent',               color:'#58a6ff'},
+    {key:'dentist', label:'Dentist Draw',        color:'#3fb950'},
+    {key:'hyg',     label:'Hygienist',           color:'#bc8cff'},
+    {key:'asst',    label:'Dental Assistant',    color:'#e3b341'},
+    {key:'mgr',     label:'Office Manager',      color:'#f78166'},
+    {key:'eqp',     label:'Equipment/Supplies',  color:'#56d364'},
+    {key:'ins',     label:'Insurance/Utilities', color:'#79c0ff'},
+  ];
+  new Chart(document.getElementById('costStackChart'),{
+    type:'bar',
+    data:{
+      labels:TOP4,
+      datasets:cats.map(cat=>({
+        label:cat.label,
+        data:TOP4.map(n=>costs[n][cat.key][0]),
+        backgroundColor:cat.color+'99', borderColor:cat.color, borderWidth:1,
+      }))
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{usePointStyle:true,boxWidth:9,padding:9,font:{size:11}}},
+        tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: $${ctx.raw}K`}}},
+      scales:{
+        x:{stacked:true,grid:{color:'transparent'}},
+        y:{stacked:true,grid:{color:C.grid},ticks:{callback:v=>'$'+v+'K'}}
+      }
+    }
+  });
+})();
+
+// ─── 7. CITY EXPLORER TABLE ───────────────────────────────────
+(()=>{
+  const tbody = document.getElementById('dtbody');
+  let data = [...cities];
+  let sCol = 10, sDir = -1;
+
+  const pillCls = n=>n==='West Orange'?'pg':n==='Hoboken'?'pb':n==='Rahway'?'pp':n==='Linden'?'pa':'';
+  const rowCls  = n=>n==='West Orange'?'rg':n==='Hoboken'?'rb':n==='Rahway'?'rp':n==='Linden'?'ra':'';
+  const sClr    = s=>s>=60?C.green:s>=50?C.blue:s>=40?C.amber:C.muted;
+
+  function render(d){
+    tbody.innerHTML='';
+    d.forEach(c=>{
+      const pc=pillCls(c.city);
+      const name=pc?`<span class="pill ${pc}">${c.city}</span>`:c.city;
+      const sc=sClr(c.score);
+      const bar=`<div class="sb-wrap"><span style="color:${sc};font-weight:600;min-width:30px">${c.score}</span><div class="sb-bg"><div class="sb-fill" style="width:${c.score}%;background:${sc}"></div></div></div>`;
+      tbody.insertAdjacentHTML('beforeend',`<tr class="${rowCls(c.city)}">
+        <td>${name}</td><td>${c.county}</td>
+        <td>${c.pop.toLocaleString()}</td>
+        <td>$${c.income.toLocaleString()}</td>
+        <td>${c.ins}%</td><td>${c.edu}%</td>
+        <td>${c.practices}</td>
+        <td>${c.ppd.toLocaleString()}</td>
+        <td>${c.sat}</td><td>${c.rating} ★</td>
+        <td>${bar}</td>
+      </tr>`);
+    });
+    document.getElementById('rowCnt').textContent=`${d.length} cities`;
+  }
+
+  window.filterTbl=()=>{
+    const q=document.getElementById('srch').value.toLowerCase();
+    data=cities.filter(c=>c.city.toLowerCase().includes(q)||c.county.toLowerCase().includes(q));
+    render(data);
+  };
+
+  window.sortTbl=col=>{
+    if(sCol===col)sDir*=-1; else{sCol=col;sDir=-1;}
+    const keys=[null,'county','pop','income','ins','edu','practices','ppd','sat','rating','score'];
+    const k=keys[col]; if(!k)return;
+    data.sort((a,b)=>{
+      const va=typeof a[k]==='string'?a[k]:+a[k];
+      const vb=typeof b[k]==='string'?b[k]:+b[k];
+      return va<vb?sDir:va>vb?-sDir:0;
+    });
+    document.querySelectorAll('#dtbl thead th').forEach((th,i)=>th.classList.toggle('sorted',i===col));
+    render(data);
+  };
+
+  data.sort((a,b)=>b.score-a.score);
+  render(data);
+})();
+</script>
+</body>
+</html>
